@@ -1,0 +1,14 @@
+.layout-fix{
+    margin-top: 5% !important;
+   
+}
+
+.info-custom{
+    margin-left: 1000px  !important;
+}
+
+.text-limit {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } 
