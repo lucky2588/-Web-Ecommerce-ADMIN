@@ -214,7 +214,7 @@ function SideBar() {
                 </li>
 
                 <li className="nav-item">
-                  <Link className="nav-link collapsed" to={"/admin/"}>
+                  <Link className="nav-link collapsed" to={"/admin/notification"}>
                     <i class="bi-globe"></i>
                     <span>Notification</span>
                   </Link>
