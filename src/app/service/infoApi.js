@@ -20,9 +20,21 @@ export const infoApi = createApi({
         getInfo: builder.query({
             query: () => `getInfoTotal`
         }),
+        getNotificationInfo: builder.query({
+            query: ({page, pageSize,chooseId} =  {page: 0, pageSize:10})  => `getNotificationInfo/${chooseId}?page=${page}&pageSize=${pageSize}`
+        }),
+        getNoticationOfUser: builder.query({
+            query: () => `getNotificationOfUser`
+        }),
+        getNoticationOfAdmin: builder.query({
+            query: () => `getNotificationOfAdmin`
+        }),
+        getBlogs: builder.query({
+            query: () => `getBlogs`
+        }),
      
     }),
 
 });
 
-export const {useGetInfoQuery} = infoApi;
+export const {useGetInfoQuery,useLazyGetNotificationInfoQuery,useLazyGetNoticationOfAdminQuery,useLazyGetNoticationOfUserQuery,useGetBlogsQuery} = infoApi;
