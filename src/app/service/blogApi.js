@@ -30,7 +30,7 @@ export const blogApi = createApi({
         ),
         getCommentBlog: builder.query(
             {
-                query: (blogId)=> `commentBlog/${blogId}`
+                query:  ({ page, pageSize , blogId } = { page: 0, pageSize: 5 }) => `commentBlog/${blogId}?page=${page}&pageSize=${pageSize}`
             }
         ),
         getLastIdOfBlogs: builder.query(
