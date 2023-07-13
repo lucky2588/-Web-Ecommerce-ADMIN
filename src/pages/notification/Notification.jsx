@@ -1,191 +1,222 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./notification.css"
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router'
+import { useLazyGetNotificationInfoQuery } from '../../app/service/infoApi'
+import moment from 'moment';
+import ReactPaginate from 'react-paginate'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 function Notification() {
+  const { auth, isAuthenticated, token } = useSelector((state) => state.auth)
+  const { chooseId } = useParams();
+  const [getData, { data, isLoading }] = useLazyGetNotificationInfoQuery();
+  const natigave = useNavigate();
+  useEffect(() => {
+    getData(
+      {
+        page: 0,
+        pageSize: 10,
+        chooseId: chooseId
+      }
+    );
+  }, [])
+  const currentDate = moment();
+
+  const handlePageClick = (page)=> {
+    getData(
+      {
+        page: page.selected,
+        pageSize: 5,
+        chooseId: chooseId
+      }
+    );
+  }
+
+  const setOptions = (e) => {
+    natigave(`/admin/notification/${e}`)
+    window.location.reload();
+  }
+
+  const handlenBtnDelete = async (id)=> {
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  
+    try {
+      const response = await axios.delete(`http://localhost:8888/api/v1/admin/deleteNotification/${id}`, config);
+      toast.success("Delete seccesss !! ")
+      getData(
+        {
+          page: 0,
+          pageSize: 10,
+          chooseId: chooseId
+        }
+      );
+    } catch (err) {
+      alert(err);
+    }
+
+  }
+
+
+  if (isLoading) {
+    return <h2>Is Loading ...</h2>
+  }
   return (
     <>
-    <br></br>
-    <br></br>
-    <div className="app-wrapper">
-  <div className="app-content pt-3 p-md-3 p-lg-4">
-    <div className="container-xl">
-      <div className="position-relative mb-3">
-        <div className="row g-3 justify-content-between">
-          <div className="col-auto">
-            <h1 className="app-page-title mb-0">Notifications</h1>
-          </div>
-          <div className="col-auto">
-            <div className="page-utilities">
-              <select className="form-select form-select-sm w-auto">
-                <option selected value="option-1">All</option>
-                <option value="option-2">News</option>
-                <option value="option-3">Product</option>
-                <option value="option-4">Project</option>
-                <option value="option-4">Billing</option>
-              </select>
-            </div>{/*//page-utilities*/}
-          </div>
-        </div>
-      </div>
-      <div className="app-card app-card-notification shadow-sm mb-4">
-        <div className="app-card-header px-4 py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-lg-auto text-center text-lg-start">						        
-              <img className="profile-image" src="assets/images/profiles/profile-1.png" alt="" />
-            </div>{/*//col*/}
-            <div className="col-12 col-lg-auto text-center text-lg-start">
-              <div className="notification-type mb-2"><span className="badge bg-info">Project</span></div>
-              <h4 className="notification-title mb-1">Notification Heading Lorem Ipsum</h4>
-              <ul className="notification-meta list-inline mb-0">
-                <li className="list-inline-item">2 hrs ago</li>
-                <li className="list-inline-item">|</li>
-                <li className="list-inline-item">Amy Doe</li>
-              </ul>
-            </div>{/*//col*/}
-          </div>{/*//row*/}
-        </div>{/*//app-card-header*/}
-        <div className="app-card-body p-4">
-          <div className="notification-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed ultrices dolor, ac maximus ligula. Donec ex orci, mollis ac purus vel, tempor pulvinar justo. Praesent nibh massa, posuere non mollis vel, molestie non mauris. Aenean consequat facilisis orci, sed sagittis mauris interdum at.</div>
-        </div>{/*//app-card-body*/}
-        <div className="app-card-footer px-4 py-3">
-          <a className="action-link" href="#">View all<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-arrow-right ms-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
-            </svg></a>
-        </div>{/*//app-card-footer*/}
-      </div>{/*//app-card*/}
-      <div className="app-card app-card-notification shadow-sm mb-4">
-        <div className="app-card-header px-4 py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-lg-auto text-center text-lg-start">						        
-              <div className="app-icon-holder">
-                <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-receipt" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z" />
-                  <path fillRule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z" />
-                </svg>
-              </div>{/*//app-icon-holder*/}
-            </div>{/*//col*/}
-            <div className="col-12 col-lg-auto text-center text-lg-start">
-              <div className="notification-type mb-2"><span className="badge bg-warning">Billing</span></div>
-              <h4 className="notification-title mb-1">Notification Heading Lorem Ipsum</h4>
-              <ul className="notification-meta list-inline mb-0">
-                <li className="list-inline-item">1 day ago</li>
-                <li className="list-inline-item">|</li>
-                <li className="list-inline-item">System</li>
-              </ul>
-            </div>{/*//col*/}
-          </div>{/*//row*/}
-        </div>{/*//app-card-header*/}
-        <div className="app-card-body p-4">
-          <div className="notification-content">Praesent nibh massa, posuere non mollis vel, molestie non mauris. Aenean consequat facilisis orci, sed sagittis mauris interdum at.</div>
-        </div>{/*//app-card-body*/}
-        <div className="app-card-footer px-4 py-3">
-          <a className="action-link" href="#">View invoice<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-arrow-right ms-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
-            </svg></a>
-        </div>{/*//app-card-footer*/}
-      </div>{/*//app-card*/}
-      <div className="app-card app-card-notification shadow-sm mb-4">
-        <div className="app-card-header px-4 py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-lg-auto text-center text-lg-start">						        
-              <div className="app-icon-holder icon-holder-mono">
-                <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-bar-chart-line" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z" />
-                </svg>
-              </div>{/*//app-icon-holder*/}
-            </div>{/*//col*/}
-            <div className="col-12 col-lg-auto text-center text-lg-start">
-              <div className="notification-type mb-2"><span className="badge bg-info">Project</span></div>
-              <h4 className="notification-title mb-1">Notification Heading Lorem Ipsum</h4>
-              <ul className="notification-meta list-inline mb-0">
-                <li className="list-inline-item">3 days ago</li>
-                <li className="list-inline-item">|</li>
-                <li className="list-inline-item">System</li>
-              </ul>
-            </div>{/*//col*/}
-          </div>{/*//row*/}
-        </div>{/*//app-card-header*/}
-        <div className="app-card-body p-4">
-          <div className="notification-content">Proin a magna sit amet mauris mollis mattis in at dui. Fusce laoreet metus et nunc lobortis, suscipit sollicitudin augue pellentesque. Maecenas maximus iaculis scelerisque.</div>
-        </div>{/*//app-card-body*/}
-        <div className="app-card-footer px-4 py-3">
-          <a className="action-link" href="#">View invoice<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-arrow-right ms-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
-            </svg></a>
-        </div>{/*//app-card-footer*/}
-      </div>{/*//app-card*/}
-      <div className="app-card app-card-notification shadow-sm mb-4">
-        <div className="app-card-header px-4 py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-lg-auto text-center text-lg-start">						        
-              <img className="profile-image" src="assets/images/profiles/profile-2.png" alt="" />
-            </div>{/*//col*/}
-            <div className="col-12 col-lg-auto text-center text-lg-start">
-              <div className="notification-type mb-2"><span className="badge bg-secondary">Product</span></div>
-              <h4 className="notification-title mb-1">Notification Heading Lorem Ipsum</h4>
-              <ul className="notification-meta list-inline mb-0">
-                <li className="list-inline-item">7 days ago</li>
-                <li className="list-inline-item">|</li>
-                <li className="list-inline-item">James Smith</li>
-              </ul>
-            </div>{/*//col*/}
-          </div>{/*//row*/}
-        </div>{/*//app-card-header*/}
-        <div className="app-card-body p-4">
-          <div className="notification-content">Sed tempor faucibus arcu, nec tristique erat congue sed. Pellentesque auctor ut elit vel feugiat. Sed a mauris tempor, tempor lacus vel, tristique metus. Nulla interdum felis id metus fermentum laoreet.</div>
-        </div>{/*//app-card-body*/}
-        <div className="app-card-footer px-4 py-3">
-          <a className="action-link" href="#">View all<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-arrow-right ms-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
-            </svg></a>
-        </div>{/*//app-card-footer*/}
-      </div>{/*//app-card*/}
-      <div className="app-card app-card-notification shadow-sm mb-4">
-        <div className="app-card-header px-4 py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-lg-auto text-center text-lg-start">						        
-              <img className="profile-image" src="assets/images/profiles/profile-3.png" alt="" />
-            </div>{/*//col*/}
-            <div className="col-12 col-lg-auto text-center text-lg-start">
-              <div className="notification-type mb-2"><span className="badge bg-success">News</span></div>
-              <h4 className="notification-title mb-1">Notification Heading Lorem Ipsum</h4>
-              <ul className="notification-meta list-inline mb-0">
-                <li className="list-inline-item">7 days ago</li>
-                <li className="list-inline-item">|</li>
-                <li className="list-inline-item">Kate Sanders</li>
-              </ul>
-            </div>{/*//col*/}
-          </div>{/*//row*/}
-        </div>{/*//app-card-header*/}
-        <div className="app-card-body p-4">
-          <div className="notification-content">Sed tempor faucibus arcu, nec tristique erat congue sed. Pellentesque auctor ut elit vel feugiat. Sed a mauris tempor, tempor lacus vel, tristique metus. Nulla interdum felis id metus fermentum laoreet.</div>
-        </div>{/*//app-card-body*/}
-        <div className="app-card-footer px-4 py-3">
-          <a className="action-link" href="#">Read more<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-arrow-right ms-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
-            </svg></a>
-        </div>{/*//app-card-footer*/}
-      </div>{/*//app-card*/}
-      <div className="text-center mt-4"><a className="btn app-btn-secondary" href="#">Load more notifications</a></div>
-    </div>{/*//container-fluid*/}
-  </div>{/*//app-content*/}
-  <footer className="app-footer">
-    <div className="container text-center py-3">
-      {/*/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) * /*/}
-      <small className="copyright">Designed with <span className="sr-only">love</span><i className="fas fa-heart" style={{color: '#fb866a'}} /> by <a className="app-link" href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for developers</small>
-    </div>
-  </footer>{/*//app-footer*/}
-</div>{/*//app-wrapper*/}
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css" rel="stylesheet" />
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <div className="app-wrapper">
+        <div className="app-content pt-2 p-md-2 p-lg-4">
+          <div className="container-xl">
+            <div className="position-relative mb-3">
+              <div className="row g-3 justify-content-between">
+                <div className="col-auto">
+                  <h1 className="app-page-title mb-0">Notifications</h1>
+                </div>
+                <div className="col-auto">
+                  <div className="page-utilities">
+                    <select defaultValue={chooseId} className="form-select form-select-sm w-auto" onChange={(e) => setOptions(e.target.value)}>
+                      <option value="2">All</option>
+                      <option value="0">User</option>
+                      <option value="1">Admin</option>
+                    </select>
+                  </div>{/*//page-utilities*/}
+                </div>
+              </div>
+            </div>
+            {
+              data?.content.map((e) => (
+                <div className="app-card app-card-notification shadow-sm mb-4">
+                  <div className="app-card-header px-4 py-3">
+                    <div className="row g-3 align-items-center">
+                      <div className="col-12 col-lg-auto text-center text-lg-start">
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
+                        <div className="notification-type mb-3">
+                          {e?.notificationStatus == "ACCOUNT" &&
+                            (
+                              <>
+                                <span className="badge bg-warning">ACCOUNT</span>
+                              </>
+                            )
+                          }
+                          {e?.notificationStatus == "UPDATE" &&
+                            (
+                              <>
+                                <span className="badge bg-info">UPDATE</span>
+                              </>
+                            )
+                          }
+                          {e?.notificationStatus == "ORDERS" &&
+                            (
+                              <>
+                                <span className="badge bg-">ORDERS</span>
+                              </>
+                            )
+                          }
+                          {e?.notificationStatus == "COMMENT" &&
+                            (
+                              <>
+                                <span className="badge bg-primary">COMMENT</span>
+                              </>
+                            )
+                          }
+
+                          {e?.notificationStatus == "BLOG" &&
+                            (
+                              <>
+                                <span className="badge bg-info">BLOG</span>
+                              </>
+                            )
+                          }
+                           {e?.notificationStatus == "PRODUCT" &&
+                            (
+                              <>
+                                <span className="badge bg-info">PRODUCT</span>
+                              </>
+                            )
+                          }
+                        </div>
+                        <h3 className="notification-title mb-2">{e?.title}</h3>
+                        <ul className="notification-meta list-inline mb-0">
+                          <li className="list-inline-item">
+                            <span>
+                              <img class="mx-2 img-thumbnail rounded-circle" height="50px" width="50px" src={e?.avatar} alt="" />
+                            </span>
+                            {e?.username}
+                          </li>
+                          <li className="list-inline-item">|</li>
+                          <li className="list-inline-item">
+                            {new Date(...e?.createAt).toLocaleDateString()}
+
+                          </li>
+                        </ul>
+                      </div>{/*//col*/}
+                    </div>{/*//row*/}
+                  </div>{/*//app-card-header*/}
+                  <div className="app-card-body p-4">
+                    <div className="notification-content"> {e?.content}</div>
+                  </div>{/*//app-card-body*/}
+                  <div className="app-card-footer px-2 py-1">
+                    <button className="btn-custom btn btn-danger" onClick={()=>handlenBtnDelete(e?.id)} href="#">Delete
+                    </button>
+                  </div>{/*//app-card-footer*/}
+                </div>
+              )
+
+              )
+            }
+          </div>{/*//container-fluid*/}
+        </div>{/*//app-content*/}
+        <nav className="my-4" aria-label="...">
+            <ul className="pagination pagination-circle justify-content-center">
+
+              <ReactPaginate
+                nextLabel="Next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={2}
+                marginPagesDisplayed={2}
+                pageCount={Math.ceil(data?.totalPages)}
+                previousLabel="< Prev"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                breakLabel="..."
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                containerClassName="pagination"
+                activeClassName="active"
+                renderOnZeroPageCount={null}
+              />
+            </ul>
+          </nav>
+
+      </div>{/*//app-wrapper*/}
+
+
+
+
+
+
+
+
+
+
     </>
   )
 }
