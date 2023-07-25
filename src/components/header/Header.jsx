@@ -1,28 +1,49 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "./header.css"
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../app/slice/authSlice';
+import { useLazyGetNoticationOfAdminQuery, useLazyGetNoticationOfUserQuery } from '../../app/service/infoApi';
+import { Button, Modal } from 'react-bootstrap';
 
 function Header() {
   const { auth, isAuthenticated } = useSelector((state) => state.auth)
-  
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
-
   const [iconUser, setIconUser] = useState(true);
+  const [nouticationOfUser, { data: usersNotication, isLoading }] = useLazyGetNoticationOfUserQuery();
+ 
+
+  useEffect(() => {
+      nouticationOfUser()
+  }, [])
+
+
+
   function toggleCollapse(id) {
     setIconUser(!iconUser)
     const element = document.getElementById(id);
     element.classList.toggle('show');
   }
 
-  const handlenBtnLogOut = ()=> {
-    dispatch(logout());
-        navigate("/login")
+  const RefreshNotication = () => {
+    nouticationOfUser()
   }
+  const handleShowModal = () => {
+    setShowModal(true);
+};
+
+const handleCloseModal = () => {
+    setShowModal(false);
+};
+
+const handlenBtnLogout =  () => {
+  dispatch(logout());
+    navigate("/login")
+};
+
   return (
     <>
-
       {/* ======= Header ======= */}
       <header id="header" className="header fixed-top d-flex align-items-center">
         <div className="d-flex align-items-center justify-content-between">
@@ -48,62 +69,84 @@ function Header() {
             <li className="nav-item dropdown">
               <a className="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                 <i class='far fa-bell'></i>
-                <span className="badge bg-primary badge-number">4</span>
+                <span className="badge bg-primary badge-number">{usersNotication?.length}</span>
               </a>{/* End Notification Icon */}
               <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                 <li className="dropdown-header">
-                  You have 4 new notifications
-                  <Link  to={"/admin/notification"} ><span className="badge rounded-pill bg-primary p-2 ms-2">View all</span></Link>
+                  You have {usersNotication?.length} new notifications
+                  <button onClick={() => RefreshNotication()} className="btn badge rounded-pill bg-primary p-2 ms-2">Refresh</button>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
-                <li className="notification-item">
-                  <i className="bi bi-exclamation-circle text-warning" />
-                  <div>
-                    <h4>Lorem Ipsum</h4>
-                    <p>Quae dolorem earum veritatis oditseno</p>
-                    <p>30 min. ago</p>
-                  </div>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li className="notification-item">
-                  <i className="bi bi-x-circle text-danger" />
-                  <div>
-                    <h4>Atque rerum nesciunt</h4>
-                    <p>Quae dolorem earum veritatis oditseno</p>
-                    <p>1 hr. ago</p>
-                  </div>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li className="notification-item">
-                  <i className="bi bi-check-circle text-success" />
-                  <div>
-                    <h4>Sit rerum fuga</h4>
-                    <p>Quae dolorem earum veritatis oditseno</p>
-                    <p>2 hrs. ago</p>
-                  </div>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li className="notification-item">
-                  <i className="bi bi-info-circle text-primary" />
-                  <div>
-                    <h4>Dicta reprehenderit</h4>
-                    <p>Quae dolorem earum veritatis oditseno</p>
-                    <p>4 hrs. ago</p>
-                  </div>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
+                {
+                  usersNotication?.length > 0 ? (
+                    <>
+                      {
+                        usersNotication.map((e) => (
+                          <>
+                            <li className="notification-item">
+                           {
+                            e.notificationStatus == "ACCOUNT" && (
+                              <i className="bi bi-person-circle text-warning" />
+                            )
+                           }
+                             {
+                            e.notificationStatus == "UPDATE" && (
+                              <i className="bi bi-gear text-danger" />
+                            )
+                           }
+                           {
+                            e.notificationStatus == "COMMENT" && (
+                              <i className="bi bi-chat-text text-primary" />
+                            )
+                           }
+                            {
+                            e.notificationStatus == "PRODUCT" && (
+                              <i className="bi bi-database-check text-info" />
+                            )
+                           }
+                               {
+                            e.notificationStatus == "BLOG" && (
+                              <i className="bi bi-database-check text-info" />
+                            )
+                           }
+                              {
+                            e.notificationStatus == "ORDERS" && (
+                              <i className="bi bi-cart text-success" />
+                            )
+                           }
+                            
+                              <div>
+                                <h4>{e.title}</h4>
+                                <p>{e.content}</p>
+                                <p>{new Date(...e?.createAt).toLocaleDateString() }</p>
+                              </div>
+                            </li>
+                            <li>
+                              <hr className="dropdown-divider" />
+                            </li>
+                          </>
+                        )
+
+                        )
+                      }
+                    </>
+                  ) : (
+                    <>
+                    <li className="notification-item">
+                              <i className="bi bi-exclamation-circle text-warning" />
+                              <div>
+                                <h3>Not found notication in recently</h3>
+                              </div>
+                            </li>
+                    </>
+                  )
+                }
+
+              
                 <li className="dropdown-footer">
-                  <Link to={"/admin/notification"}>Show all notifications</Link>
+                  <Link to={"/admin/notification/0"}>Show all notifications</Link>
                 </li>
               </ul>{/* End Notification Dropdown Items */}
             </li>{/* End Notification Nav */}
@@ -113,16 +156,33 @@ function Header() {
                 <img src={auth.avatar} alt="Profile" className="rounded-circle" />
                 <span className="d-none d-md-block dropdown-toggle ps-2">{auth.name}</span>
               </a>{/* End Profile Iamge Icon */}
+              <Modal show={showModal} onHide={handleCloseModal} centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>  </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <h3>Are you sure you want to sign out </h3>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleCloseModal}>
+                                        Cancle
+                                    </Button>
+                                    <Button variant="danger" onClick={handlenBtnLogout}>
+                                        Sure 
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+
               <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                 <li className="dropdown-header">
                   <h6>{auth.name}</h6>
                   {
-                    auth.roles.map((e)=>(
+                    auth.roles.map((e) => (
                       <span> {e.name} </span>
                     )
                     )
                   }
-                 
+
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
@@ -139,7 +199,7 @@ function Header() {
                 <li>
                   <a className="dropdown-item d-flex align-items-center" href="#">
                     <i className="bi bi-box-arrow-right" />
-                    <button className="btn btn-danger btn-rounded " onClick={handlenBtnLogOut}>Sign Out </button>
+                    <button className="btn btn-danger btn-rounded " onClick={handleShowModal}>Sign Out </button>
                   </a>
                 </li>
               </ul>{/* End Profile Dropdown Items */}
