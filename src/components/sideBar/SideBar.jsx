@@ -8,13 +8,14 @@ import { useSelector } from 'react-redux';
 function SideBar() {
   const { auth, isAuthenticated } = useSelector((state) => state.auth)
   const { data, isLoading } = useGetInfoQuery();
- 
+
   const [iconUser, setIconUser] = useState(true);
   const [iconOrder, setIconOrder] = useState(true);
   const [iconBlog, setIconBlog] = useState(true);
   const [iconProduct, setIconProduct] = useState(true);
   const [iconEmail, setIconEmail] = useState(true);
 
+  
 
   const roles = auth.roles.map((role) => role.name);
   const showRole = (authRoles, requireRoles) => {
@@ -214,7 +215,7 @@ function SideBar() {
                 </li>
 
                 <li className="nav-item">
-                  <Link className="nav-link collapsed" to={"/admin/notification"}>
+                  <Link className="nav-link collapsed" to={"/admin/notification/2"}>
                     <i class="bi-globe"></i>
                     <span>Notification</span>
                   </Link>
