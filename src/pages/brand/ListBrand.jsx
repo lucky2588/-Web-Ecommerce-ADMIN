@@ -53,7 +53,7 @@ function ListBrand() {
                                                 <td><span className="badge bg-danger text-center">{e?.nums}</span></td>
                                                 <td className='text-center'>
                                                     <Link to={`${e?.id}`} type="button" class="btn btn-square btn-primary m-2"><i class="fa fa-eye"></i></Link>
-                                                    <button type="button" class="btn btn-square btn-danger m-2"><i class="fa fa-remove"></i></button>
+                                                 
                                                 </td>
                                             </tr>
                                         )
