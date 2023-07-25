@@ -10,10 +10,12 @@ import { toast } from 'react-toastify';
 import { useGetBrandQuery } from '../../app/service/brandApi';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Button, Modal } from 'react-bootstrap';
 
 function BlogDetail() {
   const { auth, token } = useSelector((state) => state.auth);
   const { blogId } = useParams();
+  const [showModal, setShowModal] = useState(false);
   const { publicId } = useParams();
   const { data, isLoading } = useGetBlogByIdQuery(blogId);
   const { data: categories, isLoading: isLoadingOfCategories } = useGetBrandQuery();
@@ -53,7 +55,7 @@ function BlogDetail() {
       }
     };
     try {
-      const response = await axios.post(`http://localhost:8888/api/v1/public/updateBlog`, obj,config);
+      const response = await axios.post(`http://localhost:8888/api/v1/public/updateBlog`, obj, config);
       toast.success("Upload Blog Success ! ")
       natigave(`/admin/Own-blog/view/${blogId}`)
     } catch (err) {
@@ -61,21 +63,7 @@ function BlogDetail() {
     }
   }
 
-  const handlenBtnDelete = async (objPush) => {
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    };
-    try {
-      const response = await axios.delete(`http://localhost:8888/api/v1/public/deleteBlog/${blogId}`,config);
-      toast.success("Delete Blog Success ! ")
-      natigave(`/admin/Own-blog`)
-    } catch (err) {
-      alert(err);
-    }
-  }
+  
   const handleRadioChange = (event) => {
     const id = parseInt(event.target.value);
     setItem(id);
@@ -87,7 +75,7 @@ function BlogDetail() {
   };
 
   const handlenAvtar = async (e) => {
-  
+
     const file = e.target.files[0];
     const dataPush = new FormData();
     dataPush.append("file", file)
@@ -105,6 +93,29 @@ function BlogDetail() {
       console.log(err);
     }
   }
+  const handleShowModal = () => {
+    setShowModal(true);
+};
+
+const handleCloseModal = () => {
+    setShowModal(false);
+};
+
+const handlenBtnDelete = async () => {
+  const config = {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  };
+  try {
+    const response = await axios.delete(`http://localhost:8888/api/v1/public/deleteBlog/${blogId}`, config);
+    toast.success("Delete Blog Success ! ")
+    natigave(`/admin/Own-blog`)
+  } catch (err) {
+    alert(err);
+  }
+};
 
   if (isLoading && isLoadingOfCategories) {
     return <h2>Is Loading ...</h2>
@@ -119,6 +130,22 @@ function BlogDetail() {
             {/* start page title */}
             <div className="row">
               <div className="col-12">
+                <Modal show={showModal} onHide={handleCloseModal} centered>
+                  <Modal.Header closeButton>
+                    <Modal.Title>  Delete this Blog ?</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>Do you sure Delete this Blog </p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                      Cancle
+                    </Button>
+                    <Button variant="danger" onClick={handlenBtnDelete}>
+                      Sure
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
 
               </div>
             </div>
@@ -261,7 +288,7 @@ function BlogDetail() {
                     {/* end row */}
                     <div className="text-center">
                       <button type="submit" className="btn btn-success waves-effect waves-light mx-3">Update</button>
-                      <button type="button" className="btn btn-danger waves-effect waves-light mx-3" onClick={() => handlenBtnDelete(blogId)} >Delete Blog</button>
+                      <button type="button" className="btn btn-danger waves-effect waves-light mx-3" onClick={() => handleShowModal()} >Delete Blog</button>
 
                     </div>
                   </form>
