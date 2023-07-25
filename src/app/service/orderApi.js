@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
-const baseUrl = "http://localhost:8888/api/v1/admin"
+const baseUrl = "http://localhost:8888/api/v1/order"
 export const orderApi = createApi({
     reducerPath: "orderApi",
     baseQuery: fetchBaseQuery({ baseUrl: baseUrl ,
@@ -18,7 +18,9 @@ export const orderApi = createApi({
         getPayment: builder.query({
             query: (paymentId) => `getPayment/${paymentId}`
         }),
-        
+        getPayments: builder.query({
+            query: (userId) => `getPaymentsOfUser/${userId}`
+        }),
         getBillbyId: builder.query({
             query: (orderId) => `getOrder/${orderId}`
         }),
@@ -28,11 +30,12 @@ export const orderApi = createApi({
         getOrderToday: builder.query({ 
             query: () =>  `getOrderToday`
         }),
-        
-        
+        getOrderAll: builder.query({
+            query: ({page, pageSize,choose,time} =  {page: 0, pageSize:8})  => `getOrders/${choose}/${time}?page=${page}&pageSize=${pageSize}`
+        }),
      
     }),
 
 });
 
-export const {useGetBillbyIdQuery,useGetMyBillQuery,useGetPaymentQuery,useGetOrderTodayQuery} = orderApi;
+export const {useGetBillbyIdQuery,useGetPaymentsQuery,useLazyGetPaymentsQuery,useGetMyBillQuery,useLazyGetPaymentQuery,useGetPaymentQuery,useGetOrderTodayQuery,useLazyGetOrderAllQuery}  = orderApi;
