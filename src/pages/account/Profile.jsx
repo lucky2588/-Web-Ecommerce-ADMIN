@@ -165,6 +165,10 @@ function Profile() {
                       <div className="col-lg-3 col-md-4 label">Address</div>
                       <div className="col-lg-9 col-md-8">{data?.address}</div>
                     </div>
+                    <div className="row">
+                      <div className="col-lg-3 col-md-4 label"> Email</div>
+                      <div className="col-lg-9 col-md-8">{data?.email}</div>
+                    </div>
 
                     <div className="row">
                       <div className="col-lg-3 col-md-4 label">Number Phone</div>
