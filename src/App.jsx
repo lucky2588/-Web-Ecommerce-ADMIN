@@ -51,6 +51,7 @@ import AuthorizeRoutes from './components/authorizeRoutes/AuthorizeRoutes'
 import ResetPassword from './pages/login/ResetPassword'
 import Notification from './pages/notification/Notification'
 import Comment from './pages/notification/Comment'
+import CommentsBlog from './pages/comments/CommentsBlog'
 function App() {
   const [count, setCount] = useState(0)
   return (
@@ -80,6 +81,7 @@ function App() {
                 <Route index element={<ProductList />} />
                 <Route path=':productId' element={<ProductDetail />} />
                 <Route path='create' element={<ProductCreate />} />
+                <Route path='comment' element={<CommentsBlog />} />
                 <Route path='*' element={<NotFound />} />
               </Route >
 
@@ -106,7 +108,7 @@ function App() {
               </Route >
 
               <Route path='contact' element={<Contract />} />
-              <Route path='notification' element={<Notification />} />
+              <Route path='notification/:chooseId' element={<Notification />} />
               <Route path='comment' element={<Comment />} />
 
 
@@ -126,6 +128,7 @@ function App() {
                 <Route index element={<BlogList />} />
                 <Route path='create' element={<BlogCreate />} />
                 <Route path='blog/:blogId/:publicId' element={<BlogDetail />} />
+                <Route path='comment' element={<CommentsBlog />} />
                 <Route path='view/:blogId' element={<BlogView />} />
                 <Route path='*' element={<NotFound />} />
               </Route >
