@@ -4,12 +4,18 @@ import { useGetCategoryByIdQuery } from '../../app/service/categoryApi';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Button, Modal } from 'react-bootstrap';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 function CategoryDetail() {
+  const { auth, token } = useSelector((state) => state.auth);
   const { categoryId } = useParams();
   const natigave = useNavigate();
   const { data, isLoading } = useGetCategoryByIdQuery(categoryId);
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [showModal, setShowModal] = useState(false);
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   const onSubmit = async (obj) => {
     const objPush = {
@@ -19,7 +25,7 @@ function CategoryDetail() {
       thumbail: obj.thumbail
     }
     try {
-      const response = await axios.post(`http://localhost:8888/api/v1/admin/updateCategory`,objPush);
+      const response = await axios.post(`http://localhost:8888/api/v1/admin/updateCategory`, objPush);
       toast.success("Update  Success !")
       window.location.reload()
     } catch (err) {
@@ -27,19 +33,23 @@ function CategoryDetail() {
     }
   }
 
-  const handlenBtnDelete = async (objPush) => {
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handlenBtnDelete = async () => {
     try {
       const response = await axios.delete(`http://localhost:8888/api/v1/admin/deleteCategory/${categoryId}`);
       toast.success("Delete Category Success ! ")
-      natigave(`/category`)
+      natigave(`/admin/category`)
     } catch (err) {
       alert(err);
     }
-  }
-
-
-
-
+  };
   return (
     <>
 
@@ -48,13 +58,29 @@ function CategoryDetail() {
           <h4 className="fw-bold py-3 mb-4"><span className="text-muted fw-light">Forms/</span> Horizontal Layouts</h4>
           <div className="row">
             <div className="col-xxl">
-              <Link to={'/admin/category'}  className="btn btn-warning mg-2">Back</Link>
+              <Link to={'/admin/category'} className="btn btn-warning mg-2">Back</Link>
               <br></br>
               <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                   <h5 className="mb-0"> Information About Category</h5>
 
                 </div>
+                <Modal show={showModal} onHide={handleCloseModal} centered>
+                  <Modal.Header closeButton>
+                    <Modal.Title>  Delete this Category ?</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>Do you sure Delete this Category </p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                      Cancle
+                    </Button>
+                    <Button variant="danger" onClick={handlenBtnDelete}>
+                      Sure
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
                 <div className="card-body">
                   <form method='Post' onSubmit={handleSubmit(onSubmit)}>
                     <div className="row mb-3">
@@ -133,7 +159,7 @@ function CategoryDetail() {
                     <div className="row justify-content-end">
                       <div className="">
                         <button type="submit" className="btn btn-primary">Update</button>
-                        <button onClick={()=>handlenBtnDelete()} className="btn btn-danger mx-3">Delete</button>
+                        <button onClick={() => handleShowModal()} className="btn btn-danger mx-3">Delete</button>
                       </div>
                     </div>
                   </form>

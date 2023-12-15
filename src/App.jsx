@@ -52,6 +52,7 @@ import ResetPassword from './pages/login/ResetPassword'
 import Notification from './pages/notification/Notification'
 import Comment from './pages/notification/Comment'
 import CommentsBlog from './pages/comments/CommentsBlog'
+import AnalysisData from './pages/chart/AnalysisData'
 function App() {
   const [count, setCount] = useState(0)
   return (
@@ -66,7 +67,6 @@ function App() {
 
               <Route path='user'>
                 <Route index element={<ListUser />} />
-              
                 <Route path=':userId' element={<UserDetail />} />
                 <Route path='*' element={<NotFound />} />
               </Route >
@@ -74,6 +74,7 @@ function App() {
               <Route path='order'>
                 <Route index element={<OrderList />} />
                 <Route path=':orderId' element={<OrderDetail />} />
+                <Route path='Analysis' element={<AnalysisData />} />
                 <Route path='*' element={<NotFound />} />
               </Route >
 

@@ -1,21 +1,31 @@
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router'
+import { Navigate, useParams } from 'react-router'
 import { useGetUserQuery, useLazyGetUserQuery } from '../../app/service/userApi';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { useGetPaymentsQuery } from '../../app/service/orderApi';
+import { Link } from 'react-router-dom';
 
 function UserDetail() {
-  const [getData ,{ data, isLoading }] = useLazyGetUserQuery();
   const { userId } = useParams();
+  const [getData, { data, isLoading }] = useLazyGetUserQuery();
+  const { data: orders, isError } = useGetPaymentsQuery(userId);
   const { auth, isAuthenticated, token } = useSelector((state) => state.auth)
+
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   useEffect(() => {
     getData(userId);
   }, [])
 
+  const myString = "ADMIN";
+  const roles = data?.roles.map(role => role.name);
+  const checkRole = roles?.includes(myString);
 
+  if (checkRole) {
+    return <Navigate to={"/"} />
+  }
   const uptoBlogger = async () => {
     const config = {
       headers: {
@@ -80,7 +90,7 @@ function UserDetail() {
 
   }
 
-  if(isLoading) {
+  if (isLoading && isError) {
     return <h2>Is Loading ..</h2>
   }
   return (
@@ -126,7 +136,7 @@ function UserDetail() {
                   </li>
 
                   <li className="nav-item">
-                    <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
+                    <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Transaction History</button>
                   </li>
                 </ul>
                 <div className="tab-content pt-2">
@@ -154,13 +164,13 @@ function UserDetail() {
                       {
                         data != null && (
                           <div className="col-md-8 col-lg-9">
-                          <input name="linkedin" type="text" className="form-control" id="Linkedin" disabled
-                            defaultValue={new Date(...data.createAt).toLocaleDateString()}
-                          />
-                        </div>
+                            <input name="linkedin" type="text" className="form-control" id="Linkedin" disabled
+                              defaultValue={new Date(...data.createAt).toLocaleDateString()}
+                            />
+                          </div>
                         )
                       }
-                     
+
                     </div>
 
                   </div>
@@ -216,68 +226,99 @@ function UserDetail() {
                       </div>
                     </div>
                   </div>
-                  <div className="tab-pane fade pt-3" id="profile-settings">
-                    {/* Settings Form */}
-                    <form>
-                      <div className="row mb-3">
-                        <label htmlFor="fullName" className="col-md-4 col-lg-3 col-form-label">Email Notifications</label>
-                        <div className="col-md-8 col-lg-9">
-                          <div className="form-check">
-                            <input className="form-check-input" type="checkbox" id="changesMade" defaultChecked />
-                            <label className="form-check-label" htmlFor="changesMade">
-                              Changes made to your account
-                            </label>
-                          </div>
-                          <div className="form-check">
-                            <input className="form-check-input" type="checkbox" id="newProducts" defaultChecked />
-                            <label className="form-check-label" htmlFor="newProducts">
-                              Information on new products and services
-                            </label>
-                          </div>
-                          <div className="form-check">
-                            <input className="form-check-input" type="checkbox" id="proOffers" />
-                            <label className="form-check-label" htmlFor="proOffers">
-                              Marketing and promo offers
-                            </label>
-                          </div>
-                          <div className="form-check">
-                            <input className="form-check-input" type="checkbox" id="securityNotify" defaultChecked disabled />
-                            <label className="form-check-label" htmlFor="securityNotify">
-                              Security alerts
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <button type="submit" className="btn btn-primary">Save Changes</button>
-                      </div>
-                    </form>{/* End settings Form */}
-                  </div>
+
                   <div className="tab-pane fade pt-3" id="profile-change-password">
-                    {/* Change Password Form */}
-                    <form>
-                      <div className="row mb-3">
-                        <label htmlFor="currentPassword" className="col-md-4 col-lg-3 col-form-label">Current Password</label>
-                        <div className="col-md-8 col-lg-9">
-                          <input name="password" type="password" className="form-control" id="currentPassword" />
+                    <div class="col-lg-12 grid-margin stretch-card">
+                      <div class="card">
+                        <div class="card-body">
+                          <h4 class="card-title text-center">Basic Table</h4>
+
+                          <div class="table-responsive">
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Total Price.</th>
+                                  <th>Delivery</th>
+                                  <th>Status</th>
+                                  <th>Option</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {
+                                  orders?.length > 0 ? (
+                                    orders.map((e) => (
+                                      <tr>
+                                        <td>{e.id}</td>
+                                        <td>{
+                                          parseFloat(e.price).toLocaleString('en-US', {
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0,
+                                            minimumIntegerDigits: 3,
+                                          })
+                                        } đ</td>
+                                        <td>
+                                          {new Date(...e.createAt).toLocaleDateString()}
+                                        </td>
+                                        <td>
+                                          {
+                                            e?.paymentStatus == "INITIAL" && (
+                                              <span className="badge bg-primary">INITIAL</span>
+                                            )
+                                          }
+                                          {
+                                            e?.paymentStatus == "SUCCESS" && (
+                                              <span className="badge bg-success">SUCCESS</span>
+                                            )
+                                          }
+                                          {
+                                            e?.paymentStatus == "PROCEED" && (
+                                              <span className="badge bg-warning">PROCEED</span>
+                                            )
+                                          }
+                                          {
+                                            e?.paymentStatus == "Not_Receive" && (
+                                              <span className="badge bg-danger">Not Receive</span>
+                                            )
+                                          }
+                                          {
+                                            e?.paymentStatus == "REFUND" && (
+                                              <span className="badge bg-warning">REFUND</span>
+                                            )
+                                          }
+
+                                          {
+                                            e?.paymentStatus == "CANCLE" && (
+                                              <span className="badge bg-danger">CANCLE</span>
+                                            )
+                                          }
+
+                                        </td>
+                                        <td>
+                                <a class="m-n5">
+                                  <Link type="button" className="btn btn-eye btn-primary m-2" to={`/admin/order/${e.id}`}><i class="fa fa-eye"></i></Link>
+                                </a>
+                              </td>
+                                      </tr>
+                                    )
+                                    )
+
+                                  ) : (
+                                    <tr>
+                                      <td>Emtpy </td>
+
+
+                                    </tr>
+                                  )
+                                }
+
+
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
-                      <div className="row mb-3">
-                        <label htmlFor="newPassword" className="col-md-4 col-lg-3 col-form-label">New Password</label>
-                        <div className="col-md-8 col-lg-9">
-                          <input name="newpassword" type="password" className="form-control" id="newPassword" />
-                        </div>
-                      </div>
-                      <div className="row mb-3">
-                        <label htmlFor="renewPassword" className="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
-                        <div className="col-md-8 col-lg-9">
-                          <input name="renewpassword" type="password" className="form-control" id="renewPassword" />
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <button type="submit" className="btn btn-primary">Change Password</button>
-                      </div>
-                    </form>{/* End Change Password Form */}
+                    </div>
                   </div>
                 </div>{/* End Bordered Tabs */}
               </div>

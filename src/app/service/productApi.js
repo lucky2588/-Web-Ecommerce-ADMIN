@@ -21,6 +21,9 @@ export const productApi = createApi({
         searchProduct: builder.query({
             query: ({keyword,page,pageSize}) => `searchProduct?title=${keyword}&page=${page}&pageSize=${pageSize}`
         }),
+        getList: builder.query({
+            query: ({ page, pageSize } = { page: 0, pageSize: 12 }) => `getProducts/ProductSales?page=${page}&pageSize=${pageSize}`
+        }),
         getProductFilter: builder.query({
             query: ({brandId , categoryId ,price, page, pageSize } = { page: 0, pageSize: 5 }) => `getProductsFilter?brandId=${brandId}&categoryId=${categoryId}&price=${price}&page=${page}&pageSize=${pageSize}`
         }),
@@ -45,4 +48,6 @@ export const productApi = createApi({
     }),
 });
 
-export const {useGetProductByIdQuery,useLazyGetProductCommentQuery,useLazySearchProductQuery,useGetProductSimilarQuery,useGetProductsQuery,useGetProductCommentQuery,useGetBrandForCategoryQuery,useLazyGetProductsQuery,useLazyGetProductFilterByCategoryQuery,useLazyGetProductFilterQuery,useGetTopProductBestSellerQuery,useGetTopProductViewQuery} = productApi;
+export const {useGetProductByIdQuery,useLazyGetProductCommentQuery,useLazySearchProductQuery,
+    useGetProductSimilarQuery,useGetProductsQuery,useGetProductCommentQuery,useGetBrandForCategoryQuery,useLazyGetProductsQuery,
+    useLazyGetProductFilterByCategoryQuery,useLazyGetProductFilterQuery,useLazyGetTopProductBestSellerQuery,useGetTopProductViewQuery,useLazyGetListQuery} = productApi;

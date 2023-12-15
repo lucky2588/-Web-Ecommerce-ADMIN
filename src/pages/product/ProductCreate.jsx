@@ -1,7 +1,113 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./product.css"
+import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { useGetBrandQuery } from '../../app/service/brandApi';
+import { useNavigate } from 'react-router';
+import { useGetCategoriesQuery } from '../../app/service/categoryApi';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 function ProductCreate() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { auth, token } = useSelector((state) => state.auth);
+  const [selectedValue, setSelectedValue] = useState();
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [images, setImages] = useState([]);
+  const [xFile, setFile] = useState();
+  const [xFiles, setFiles] = useState();
+  const [selectedCategory, setSelectedCategory] = useState();
+  const { data: categories, isLoading: isLoadingOfCategories } = useGetCategoriesQuery();
+  const { data: brands, isLoading: isLoading } = useGetBrandQuery();
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  const natigate = useNavigate();
+  console.log(xFile)
+  console.log(xFiles)
+  const onSubmit = async (data) => {
+    const obj = {
+      content: data.content,
+      brandId: selectedValue,
+      categoryId : selectedCategory,
+      description: data.description,
+      detail : data.detail,
+      name: data.title,
+      nums: data.nums,
+      price : data.price
+    }
+    try {
+      const response = await axios.post(`http://localhost:8888/api/v1/public/createProduct`, obj);
+      const objImage = {
+        productId: response,
+        file: xFile
+      }
+      updloadImage(objImage)
+    } catch (err) {
+      alert(err);
+    }
+  }
+  const updloadImage = async (data) => {
+    const dataPush = new FormData();
+    dataPush.append("file", data.file)
+    try {
+      const rs = await axios.post(`http://localhost:8888/api/v1/files/product/${data.productId.data}`, dataPush, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      toast.success("Create Product Success !! ")
+      natigate("/admin/Own-product")
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
+ const getFile = (file) => {
+  setFile(file);
+};
+
+ const handleImageChange = (event) => {
+  const file = event.target.files[0];
+  getFile(file)
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    setSelectedImage(e.target.result);
+  };
+  reader.readAsDataURL(file)
+}
+
+ const handleSelectChange = (event)=>{
+  setSelectedValue(event.target.value);
+ }
+ const handlenSelectCategory = (event)=>{
+  setSelectedCategory(event.target.value);
+ }
+ const getFiles = (file) => {
+  setFiles(file);
+};
+ const handleFileChange = (event) => {
+  const fileList = event.target.files;
+  getFiles(fileList)
+  const imageArray = [];
+  for (let i = 0; i < fileList.length; i++) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageArray.push(e.target.result);
+      if (imageArray.length === fileList.length) {
+        setImages([...imageArray]);
+      }
+    };
+    reader.readAsDataURL(fileList[i]);
+  }
+};
+
+
+
+
+
+
+
+
   return (
     <>
     <div className="main">
@@ -10,152 +116,251 @@ function ProductCreate() {
       <div className="col-lg-12">
         <div className="card">
           <div className="card-header">
-            <strong>Basic Form</strong> Elements
+            <strong>Thông tin sản phẩm</strong> 
           </div>
           <div className="card-body card-block">
-            <form action method="post" encType="multipart/form-data" className="form-horizontal">
+            <form  method='Post' onSubmit={handleSubmit(onSubmit)} className="form-horizontal">
               <div className="row form-group">
-                <div className="col col-md-3"><label className=" form-control-label">Static</label></div>
+                <div className="col col-md-3"><label htmlFor="text-input" className=" form-control-label">Tên sản phẩm</label></div>
                 <div className="col-12 col-md-9">
-                  <p className="form-control-static">Username</p>
-                </div>
+                  <input 
+                  type="text" id="text-input" name="text-input" placeholder="Nhập tên sản phẩm" className="form-control" 
+                   {...register("title",
+                   {
+                     required: true
+                   }
+                 )
+                 }
+                  />
+                   {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.title?.type === "required" &&
+                              <li className='text-danger'>This field is not empty</li>
+                            }
+                          </ul>
+                        )
+                        }
+                  <small className="form-text text-muted">  </small></div>
               </div>
+              <br/>
               <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="text-input" className=" form-control-label">Text Input</label></div>
-                <div className="col-12 col-md-9"><input type="text" id="text-input" name="text-input" placeholder="Text" className="form-control" /><small className="form-text text-muted">This is a help text</small></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="email-input" className=" form-control-label">Email Input</label></div>
-                <div className="col-12 col-md-9"><input type="email" id="email-input" name="email-input" placeholder="Enter Email" className="form-control" /><small className="help-block form-text">Please enter your email</small></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="password-input" className=" form-control-label">Password</label></div>
-                <div className="col-12 col-md-9"><input type="password" id="password-input" name="password-input" placeholder="Password" className="form-control" /><small className="help-block form-text">Please enter a complex password</small></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="disabled-input" className=" form-control-label">Disabled Input</label></div>
-                <div className="col-12 col-md-9"><input type="text" id="disabled-input" name="disabled-input" placeholder="Disabled" disabled className="form-control" /></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="textarea-input" className=" form-control-label">Textarea</label></div>
-                <div className="col-12 col-md-9"><textarea name="textarea-input" id="textarea-input" rows={9} placeholder="Content..." className="form-control" defaultValue={""} /></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="select" className=" form-control-label">Select</label></div>
+                <div className="col col-md-3"><label htmlFor="email-input" className=" form-control-label"> Giới thiệu </label></div>
                 <div className="col-12 col-md-9">
-                  <select name="select" id="select" className="form-control">
-                    <option value={0}>Please select</option>
-                    <option value={1}>Option #1</option>
-                    <option value={2}>Option #2</option>
-                    <option value={3}>Option #3</option>
-                  </select>
-                </div>
+                  <input
+                  type="text" placeholder="Giới thiệu qua về sản phẩm" className="form-control" 
+                  {...register("content",
+                  {
+                    required: true
+                  }
+                )
+                }
+                  />
+                    {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.content?.type === "required" &&
+                              <li className='text-danger'>This field is not empty</li>
+                            }
+                          </ul>
+                        )
+                        }
+                  
+                  <small className="help-block form-text"></small></div>
               </div>
+              <br/>
+              <br/>
               <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="selectLg" className=" form-control-label">Select Large</label></div>
+                <div className="col col-md-3"><label htmlFor="textarea-input" className=" form-control-label">Mô tả</label></div>
                 <div className="col-12 col-md-9">
-                  <select name="selectLg" id="selectLg" className="form-control-lg form-control">
-                    <option value={0}>Please select</option>
-                    <option value={1}>Option #1</option>
-                    <option value={2}>Option #2</option>
-                    <option value={3}>Option #3</option>
-                  </select>
-                </div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="selectSm" className=" form-control-label">Select Small</label></div>
-                <div className="col-12 col-md-9">
-                  <select name="selectSm" id="SelectLm" className="form-control-sm form-control">
-                    <option value={0}>Please select</option>
-                    <option value={1}>Option #1</option>
-                    <option value={2}>Option #2</option>
-                    <option value={3}>Option #3</option>
-                    <option value={4}>Option #4</option>
-                    <option value={5}>Option #5</option>
-                  </select>
-                </div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="disabledSelect" className=" form-control-label">Disabled Select</label></div>
-                <div className="col-12 col-md-9">
-                  <select name="disabledSelect" id="disabledSelect" disabled className="form-control">
-                    <option value={0}>Please select</option>
-                    <option value={1}>Option #1</option>
-                    <option value={2}>Option #2</option>
-                    <option value={3}>Option #3</option>
-                  </select>
-                </div>
-              </div>
-              <br />
-              <br />
-           
-              <br />
-              <div className="row form-group">
-                <div className="col col-md-3"><label className=" form-control-label">Radios</label></div>
-                <div className="col col-md-9">
-                  <div className="form-check">
-                    <div className="radio">
-                      <label htmlFor="radio1" className="form-check-label ">
-                        <input type="radio" id="radio1" name="radios" defaultValue="option1" className="form-check-input" />Option 1
-                      </label>
-                    </div>
-                    <div className="radio">
-                      <label htmlFor="radio2" className="form-check-label ">
-                        <input type="radio" id="radio2" name="radios" defaultValue="option2" className="form-check-input" />Option 2
-                      </label>
-                    </div>
-                    <div className="radio">
-                      <label htmlFor="radio3" className="form-check-label ">
-                        <input type="radio" id="radio3" name="radios" defaultValue="option3" className="form-check-input" />Option 3
-                      </label>
-                    </div>
+                  <input  rows={9} placeholder="Mô tả  sản phẩm" className="form-control"  
+                    {...register("description",
+                    {
+                      required: true
+                    }
+                  )
+                  }
+                  />
+                    {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.description?.type === "required" &&
+                              <li className='text-danger'>This field is not empty</li>
+                            }
+                          </ul>
+                        )
+                        }
                   </div>
+                
+              </div>
+              <br></br>
+              <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="textarea-input" className=" form-control-label">Thông tin chi tiết</label></div>
+                <div className="col-12 col-md-9">
+                  <textarea rows={9} placeholder="chi tiết về sản phẩm" className="form-control" defaultValue={""}
+                  {...register("detail",
+                  {
+                    required: true
+                   
+                  }
+                )
+                }
+                  />
+                  {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.detail?.type === "required" &&
+                              <li className='text-danger'>This field is not empty</li>
+                            }
+                          </ul>
+                        )
+                        }
+                  
+                  </div>
+              </div>
+              <br/>
+              <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="select" className=" form-control-label">Thương Hiệu</label></div>
+                <div className="col-12 col-md-9">
+                  <select name="select" id="select" className="form-control"  value={selectedValue} onChange={handleSelectChange}>
+                  <option value={100}> Chọn Thương Hiệu</option>
+                   {
+                     brands?.map((e)=>(
+                      <option value={e?.id}>{e?.name}</option>
+                     )
+                    )
+                   }
+                  </select>
                 </div>
               </div>
+              <br/>
+               <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="select" className=" form-control-label">Thể Loại</label></div>
+                <div className="col-12 col-md-9">
+                  <select name="select" id="select" className="form-control"   value={selectedCategory} onChange={handlenSelectCategory}>
+                  <option value={100}> Chọn Thể Loại</option>
+                    {categories?.map((e)=>(
+                       <option value={e?.id}>{e?.name}</option>
+                    ))
+                    
+                    }
+
+                  
+                   
+                  </select>
+                </div>
+              </div>
+              <br></br>
+              
+              <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="text-input" className=" form-control-label">Giá Sản Phẩm</label></div>
+                <div className="col-3 col-md-3">
+                  <input type="number" id="text-input" name="text-input" placeholder="Nhập giá tiền của sản phẩm" className="form-control" 
+                     {...register("price",
+                     {
+                       required: true,
+                       min:0
+                     }
+                   )
+                   }
+                  />
+                    {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.price?.type === "required" &&
+                              <li className='text-danger'>Giá của sản phẩm không để trống</li>
+                            }
+                            {errors.price?.type === "min" &&
+                              <li className='text-danger'>Giá của sản phẩm không được âm</li>
+                            }
+                          </ul>
+                        )
+                        }
+                  <small className="form-text text-muted">  </small></div>
+              </div>
+             
+              <br />
+              <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="text-input" className=" form-control-label">Số Lượng Sản Phẩm</label></div>
+                <div className=" col-md-3">
+                  <input type="number" id="text-input"  placeholder="Nhập giá tiền của sản phẩm" className="form-control" 
+                  {...register("nums",
+                  {
+                    required: true,
+                    min:1
+                  }
+                )
+                }
+                  />
+                    {Object.keys(errors).length !== 0 && (
+                          <ul>
+                            {errors.nums?.type === "required" &&
+                              <li className='text-danger'>This field is not empty</li>
+                            }
+                            {errors.nums?.type === "min" &&
+                              <li className='text-danger'>Số lượng không thể nhỏ hơn 1 </li>
+                            }
+                          </ul>
+                        )
+                        }
+                  <small className="form-text text-muted">  </small></div>
+              </div>
+              <br />  
+              <br />
+
               <br />
             
-            
+              <br></br>
               <div className="row form-group">
-                <div className="col col-md-3"><label className=" form-control-label">Checkboxes</label></div>
-                <div className="col col-md-9">
-                  <div className="form-check">
-                    <div className="checkbox">
-                      <label htmlFor="checkbox1" className="form-check-label ">
-                        <input type="checkbox" id="checkbox1" name="checkbox1" defaultValue="option1" className="form-check-input" />Option 1
-                      </label>
-                    </div>
-                    <div className="checkbox">
-                      <label htmlFor="checkbox2" className="form-check-label ">
-                        <input type="checkbox" id="checkbox2" name="checkbox2" defaultValue="option2" className="form-check-input" /> Option 2
-                      </label>
-                    </div>
-                    <div className="checkbox">
-                      <label htmlFor="checkbox3" className="form-check-label ">
-                        <input type="checkbox" id="checkbox3" name="checkbox3" defaultValue="option3" className="form-check-input" /> Option 3
-                      </label>
-                    </div>
-                  </div>
+                <div className="col col-md-3"><label htmlFor="file-input" className=" form-control-label">Ảnh Đại Diện</label></div>
+                <div className="col-12 col-md-9"><input
+               type="file"
+               className="form-control"
+               id="imageUpload"
+               accept="image/*"
+               onChange={handleImageChange}
+                
+                />
+                 {selectedImage && (
+                <div className="mt-5 col-12 ">
+                  <img src={selectedImage} alt="Preview" className="img-thumbnail text-center" height="175px" width="175px" />
+                </div>
+              )}
+                </div>
+                
+              </div>
+              <br></br>
+              <div className="row form-group">
+                <div className="col col-md-3"><label htmlFor="file-multiple-input" className=" form-control-label">Ảnh Chi Tiết</label></div>
+               
+                <div className="col-12 col-md-9"><input 
+                
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                />
+                
+                  
+                {images.length > 0 && (
+        <div>
+          <h3>Ảnh đã chọn:</h3>
+          {images.map((image, index) => (
+            <>
+             <img key={index} src={image} alt={`Image ${index}`} width="150" />
+            </>
+
+          ))}
+        </div>
+      )}
                 </div>
               </div>
-           
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="file-input" className=" form-control-label">File input</label></div>
-                <div className="col-12 col-md-9"><input type="file" id="file-input" name="file-input" className="form-control-file" /></div>
-              </div>
-              <div className="row form-group">
-                <div className="col col-md-3"><label htmlFor="file-multiple-input" className=" form-control-label">Multiple File input</label></div>
-                <div className="col-12 col-md-9"><input type="file" id="file-multiple-input" name="file-multiple-input" multiple className="form-control-file" /></div>
-              </div>
-            </form>
-          </div>
-          <div className="card-footer">
+              <div className="card-footer">
             <button type="submit" className="btn btn-primary btn-sm">
-              <i className="fa fa-dot-circle-o" /> Submit
+              <i className="fa fa-dot-circle-o" /> Tạo
             </button>
             <button type="reset" className="btn btn-danger btn-sm">
-              <i className="fa fa-ban" /> Reset
+              <i className="fa fa-ban" /> Hủy
             </button>
           </div>
+            </form>
+          </div>
+        
         </div>
      
       </div>

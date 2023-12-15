@@ -101,9 +101,9 @@ function SideBar() {
                       </Link>
                     </li>
                     <li>
-                      <a href="tables-data.html">
-                        <i className="bi bi-circle" /><span>View Table</span>
-                      </a>
+                      <Link to={"order/Analysis"}>
+                        <i className="bi bi-circle" /><span>Analysis Data</span>
+                      </Link>
                     </li>
                   </ul>
                 </li>

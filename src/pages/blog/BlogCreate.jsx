@@ -20,16 +20,13 @@ function BlogCreate() {
   const [xFile, setFile] = useState();
   const [status, setStatus] = useState(1);
   const { register, handleSubmit, formState: { errors } } = useForm();
-
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     getFile(file)
     const reader = new FileReader();
-
     reader.onload = (e) => {
       setSelectedImage(e.target.result);
     };
-
     reader.readAsDataURL(file)
   }
   const handleSelectChange = (event) => {
@@ -51,14 +48,12 @@ function BlogCreate() {
       description: data.description,
       title: data.title
     }
-
     const config = {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     };
-
     try {
       const response = await axios.post(`http://localhost:8888/api/v1/public/createBlog`, obj, config);
       if (xFile == null) {
@@ -75,8 +70,6 @@ function BlogCreate() {
     }
   }
   const updloadImage = async (data) => {
-    console.log(data)
-
     const config = {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -101,8 +94,8 @@ function BlogCreate() {
     if (isLoadingOfCategories) {
       return <h2>is loading ... </h2>
     }
-
   }
+
   return (
     <>
       <div className='main'>
@@ -181,7 +174,7 @@ function BlogCreate() {
             <div class="row mb-3 col-4">
               <label class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
-                <select className="form-select" aria-label="Default select example" value={selectedValue} onChange={handleSelectChange}>
+                <select className="form-select" aria-label="Default select example" value={selectedValue} onChange={handleSelectChange}  >
                   <option value={100}> Choose for Blog</option>
                   {categories?.map((e) => (
                     <option value={e?.id} >{e?.name}</option>

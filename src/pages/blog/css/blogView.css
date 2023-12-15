@@ -3,5 +3,12 @@
 }
 
 .btn-custom{
-    margin-left: 1000px;
+    padding-left: 20px;
+    margin-top: 50px !important;
+   
+}
+
+.img-custom{
+    margin-top: 50% !important;
+    margin-left: 30px;
 }

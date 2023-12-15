@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux';
 import { useLazyGetBlogsByAuthorQuery, useLazyGetBlogsQuery } from '../../app/service/blogApi';
 import { useEffect } from 'react';
 import ReactPaginate from 'react-paginate';
+import { Bar } from 'react-chartjs-2';
+import { chartBar } from './chart';
 
 function HomePage() {
     const { auth, isAuthenticated } = useSelector((state) => state.auth)
@@ -24,6 +26,13 @@ function HomePage() {
     const isShowMenu = (authRoles, requireRoles) => {
         return authRoles.some((role) => requireRoles.includes(role));
     };
+    const arr = [
+        "thang 1", "thang 2", "thang 3"
+    ];
+    const option = [
+        666, 888, 222
+    ];
+    const { data: dataChatbar, options } = chartBar(arr, option);
     useEffect(() => {
         getBlogs(
             {
@@ -33,10 +42,6 @@ function HomePage() {
         );
         nouticationOfAdmin()
     }, [])
-
-
-
-    console.log(adminNotication)
     const handlePageClick = (page) => {
         getBlogs(
             {
@@ -48,6 +53,9 @@ function HomePage() {
     const handlenBtnRefresh = () => {
         nouticationOfAdmin()
     }
+    const handlenBtnRefreshAll = () => {
+        window.location.reload();
+    }
     if (isLoading) {
         return <h2> Is Loading ...</h2>
     }
@@ -58,7 +66,12 @@ function HomePage() {
                     <>
                         <div className='layout-main'>
                             <div className="pagetitle">
-                                <h1>Dashboard</h1>
+                                <h1>Dashboard
+                                    <Link to="/admin">
+                                        <span><i class="bi-arrow-clockwise"> </i></span>
+                                    </Link>
+
+                                </h1>
                                 <nav>
                                     <ol className="breadcrumb">
                                         <li className="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -68,10 +81,8 @@ function HomePage() {
                             </div>
                             <section className="section dashboard">
                                 <div className="row">
-
                                     <div className="col-lg-8">
                                         <div className="row">
-
                                             <div className="col-xxl-4 col-md-6">
                                                 <div className="card info-card sales-card">
                                                     <div className="filter">
@@ -81,7 +92,6 @@ function HomePage() {
                                                                 <h6>Option</h6>
                                                             </li>
                                                             <li><a className="dropdown-item" href="#">View Detail</a></li>
-                                                            <li><a className="dropdown-item" href="#">Create User</a></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
@@ -107,8 +117,8 @@ function HomePage() {
                                                             <li className="dropdown-header text-start">
                                                                 <h6>Option</h6>
                                                             </li>
-                                                            <li><a className="dropdown-item" href="#">View Detail</a></li>
-                                                            <li><a className="dropdown-item" href="#">Create Blog</a></li>
+                                                            <li><Link to={'/admin/Own-blog'} className="dropdown-item" >View Detail</Link></li>
+                                                            <li><Link to={'/admin/Own-blog/create'} className="dropdown-item" >Create </Link></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
@@ -125,8 +135,6 @@ function HomePage() {
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                             <div className="col-xxl-4 col-md-6">
                                                 <div className="card info-card sales-card">
                                                     <div className="filter">
@@ -135,8 +143,8 @@ function HomePage() {
                                                             <li className="dropdown-header text-start">
                                                                 <h6>Option</h6>
                                                             </li>
-                                                            <li><a className="dropdown-item" href="#">View Detail</a></li>
-                                                            <li><a className="dropdown-item" href="#">Create </a></li>
+                                                            <li><Link to={'/admin/order'} className="dropdown-item" >View Detail</Link></li>
+                                                            <li><Link className="dropdown-item" href="#">Create </Link></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
@@ -153,7 +161,6 @@ function HomePage() {
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div className="col-xxl-4 col-md-6">
                                                 <div className="card info-card sales-card">
                                                     <div className="filter">
@@ -162,25 +169,23 @@ function HomePage() {
                                                             <li className="dropdown-header text-start">
                                                                 <h6>Option</h6>
                                                             </li>
-                                                            <li><a className="dropdown-item" href="#">View Detail</a></li>
+                                                            <li><Link to={'/admin/order'} className="dropdown-item" >View Detail</Link></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
-                                                        <h5 className="card-title">Pending Orders <span>| Total</span></h5>
+                                                        <h5 className="card-title"> Orders <span>| Total</span></h5>
                                                         <div className="d-flex align-items-center">
                                                             <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                                                 <i class="bi-cart-dash"></i>
                                                             </div>
                                                             <div className="ps-3">
                                                                 <h6 className='text'>{data?.orderStatus}</h6>
-                                                                <span className="text-success small pt-1 fw-bold"> INITIAL</span>
+                                                                <span className="text-success small pt-1 fw-bold"> ORDER</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                             <div className="col-xxl-4 col-md-6">
                                                 <div className="card info-card sales-card">
                                                     <div className="filter">
@@ -189,25 +194,23 @@ function HomePage() {
                                                             <li className="dropdown-header text-start">
                                                                 <h6>Option</h6>
                                                             </li>
-                                                            <li><a className="dropdown-item" href="#">View Detail</a></li>
+                                                            <li><Link to={'/admin/order'} className="dropdown-item" >View Detail</Link></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
-                                                        <h5 className="card-title"> Processing<span>| Total</span></h5>
+                                                        <h5 className="card-title"> INITIAL<span>| Total</span></h5>
                                                         <div className="d-flex align-items-center">
                                                             <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                                <i class="bi-truck"></i>
+                                                                <i class="bi-check-circle"></i>
                                                             </div>
                                                             <div className="ps-3">
                                                                 <h6 className='text'>{data?.orderProcess}</h6>
-                                                                <span className="text-danger small pt-1 fw-bold">ARE BEING PROCEESING </span>
+                                                                <span className="text-danger small pt-1 fw-bold"> Need Confirm </span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                             <div className="col-xxl-4 col-md-6">
                                                 <div className="card info-card sales-card">
                                                     <div className="filter">
@@ -216,7 +219,7 @@ function HomePage() {
                                                             <li className="dropdown-header text-start">
                                                                 <h6>Option</h6>
                                                             </li>
-                                                            <li><a className="dropdown-item" href="#">View Detail</a></li>
+                                                            <li><Link to={'/admin/order'} className="dropdown-item" >View Detail</Link></li>
                                                         </ul>
                                                     </div>
                                                     <div className="card-body">
@@ -279,8 +282,10 @@ function HomePage() {
                                                                         orders.map((e) => (
                                                                             <tbody>
                                                                                 <tr>
-                                                                                    <th scope="row"><Link className='text-decoration-none'>{e?.id}</Link></th>
-                                                                                    <td><Link className='text-decoration-none'>{e?.user.name}  </Link></td>
+                                                                                    <th scope="row"><Link to={`/admin/order/${e?.id}`} className='text-decoration-none'>{e?.id}</Link></th>
+                                                                                    <td>
+                                                                                        <Link to={`/admin/user/${e?.user.id}`} className='text-decoration-none'>{e?.user.name}  </Link>
+                                                                                    </td>
                                                                                     <td className='d-flex justify-content-between'><span href="#" className="text">
                                                                                         {e?.text != null ? (
                                                                                             <>
@@ -320,6 +325,17 @@ function HomePage() {
                                                                                             )
                                                                                         }
                                                                                         {
+                                                                                            e?.paymentStatus == "Not_Receive" && (
+                                                                                                <span className="badge bg-danger">Not Receive</span>
+                                                                                            )
+                                                                                        }
+                                                                                        {
+                                                                                            e?.paymentStatus == "REFUND" && (
+                                                                                                <span className="badge bg-warning">REFUND</span>
+                                                                                            )
+                                                                                        }
+
+                                                                                        {
                                                                                             e?.paymentStatus == "CANCLE" && (
                                                                                                 <span className="badge bg-danger">CANCLE</span>
                                                                                             )
@@ -338,7 +354,7 @@ function HomePage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* Reports */}
+
                                             <div className="col-12">
                                                 <div className="card">
                                                     <div className="filter">
@@ -362,7 +378,7 @@ function HomePage() {
                                             </div>{/* End Reports */}
                                             {/* Recent Sales */}
 
-                                            {/* Top Selling */}
+
                                             <div className="col-12">
                                                 <div className="card top-selling overflow-auto">
                                                     <div className="filter">
@@ -394,8 +410,8 @@ function HomePage() {
 
                                                                     <tbody>
                                                                         <tr>
-                                                                            <th scope="row"><a href="#"><img className='' src={e.thumbail} alt="" /></a></th>
-                                                                            <td><a href="#" className="text-decoration-none">{e.username}</a></td>
+                                                                            <th scope="row"><a href="#"><img className='img-thumbnail rounded-circle' src={e.thumbail} alt="" /></a></th>
+                                                                            <td><Link to={`/admin/user/${e?.userId}`} className="text-decoration-none">{e.username}</Link></td>
 
                                                                             <td className="fw-bold ">
                                                                                 {e.countBill}
@@ -406,7 +422,7 @@ function HomePage() {
                                                                                     maximumFractionDigits: 0,
                                                                                     minimumIntegerDigits: 3,
                                                                                 })
-                                                                            }</td>
+                                                                            } đ</td>
                                                                         </tr>
                                                                     </tbody>
                                                                 )
@@ -483,7 +499,7 @@ function HomePage() {
                                                                                 }
 
                                                                                 <div className="activity-content">
-                                                                                    <a href="#" className="fw-bold text-dark">{e.username}</a> {e.title}
+                                                                                    <a href="#" className="fw-bold text-dark">{e.username}</a> {e.content}
                                                                                 </div>
                                                                             </div>
                                                                         </>
@@ -518,9 +534,13 @@ function HomePage() {
                                             </div>
                                             <div className="card-body pb-0">
                                                 <h5 className="card-title">Website Traffic <span>| Today</span></h5>
-                                                <div id="trafficChart" style={{ minHeight: '400px' }} className="echart" />
+
+                                                <Bar
+                                                    options={options} data={dataChatbar}
+                                                />
                                             </div>
-                                        </div>{/* End Website Traffic */}
+                                        </div>
+
                                         {/* News & Updates Traffic */}
                                         <div className="card">
                                             <div className="filter">
@@ -545,12 +565,12 @@ function HomePage() {
                                                             </div>
                                                         ))
                                                     }
-                                                   
 
-                                                </div> 
+
+                                                </div>
                                             </div>
-                                        </div> 
-                                    </div>          
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
                         </div>

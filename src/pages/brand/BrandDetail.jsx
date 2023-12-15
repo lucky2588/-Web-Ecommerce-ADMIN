@@ -1,19 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useGetCategoryByIdQuery } from '../../app/service/categoryApi';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useGetBrandByIdQuery } from '../../app/service/brandApi';
+import { Button, Modal } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+
 
 
 function BrandDetail() {
+  const { auth, token  } = useSelector((state) => state.auth);
   const { brandId } = useParams();
   const natigave = useNavigate();
   const { data, isLoading } = useGetBrandByIdQuery(brandId);
   const { register, handleSubmit, formState: { errors } } = useForm();
-  console.log(data)
+  const [showModal, setShowModal] = useState(false);
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   const onSubmit = async (obj) => {
     const objPush = {
       brandId: brandId,
@@ -30,9 +42,9 @@ function BrandDetail() {
     }
   }
 
-  const handlenBtnDelete = async (objPush) => {
+  const handlenBtnDelete = async () => {
     try {
-      const response = await axios.delete(`http://localhost:8888/api/v1/public/deleteBrand/${brandId}`);
+      const response = await axios.delete(`http://localhost:8888/api/v1/admin/deleteBrand/${brandId}`);
       toast.success("Delete Brand Success ! ")
       natigave(`/admin/brand`)
     } catch (err) {
@@ -53,6 +65,22 @@ function BrandDetail() {
                   <h5 className="mb-0"> Information Of Brand</h5>
 
                 </div>
+                <Modal show={showModal} onHide={handleCloseModal} centered>
+                  <Modal.Header closeButton>
+                    <Modal.Title>  Delete this Category ?</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>Do you sure Delete this Category </p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                      Cancle
+                    </Button>
+                    <Button variant="danger" onClick={handlenBtnDelete}>
+                      Sure
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
                 <div className="card-body">
                   <form method='Post' onSubmit={handleSubmit(onSubmit)}>
                     <div className="row mb-3">
@@ -133,7 +161,7 @@ function BrandDetail() {
                     <div className="row justify-content-end">
                       <div className="">
                         <button type="submit" className="btn btn-primary">Update</button>
-                        <button onClick={() => handlenBtnDelete()} className="btn btn-danger mx-3">Delete</button>
+                        <button onClick={() => handleShowModal()} className="btn btn-danger mx-3">Delete</button>
                       </div>
                     </div>
                   </form>

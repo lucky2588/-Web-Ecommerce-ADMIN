@@ -3,10 +3,8 @@ import "./listUser.css"
 import ReactPaginate from 'react-paginate'
 import { useLazyGetUsersQuery,  } from '../../app/service/userApi'
 import { Link } from 'react-router-dom';
-
 function ListUser() {
   const [getData, { data, isLoading }] = useLazyGetUsersQuery();
-
   useEffect(() => {
     getData(
       {
@@ -71,6 +69,7 @@ function ListUser() {
                           <tr>
                             <th>Avatar</th>
                             <th>Email</th>
+                            <th>FullName</th>
                             <th>Contact No.</th>
                             <th>Address</th>
                             <th>Action</th>
@@ -84,6 +83,9 @@ function ListUser() {
                               </td>
                               <td>
                                 <Link href="#">{e?.email}</Link>
+                              </td>
+                              <td>
+                                <Link href="#">{e?.name}</Link>
                               </td>
                               <td>
                                 {e?.phone}
